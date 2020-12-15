@@ -46,6 +46,7 @@ void check_prog(T_prog prog) {
   CHARTYPE = create_primitivetype(E_typename_char);
   STRINGTYPE = create_pointertype(CHARTYPE);
   STRINGARRAYTYPE = create_pointertype(STRINGTYPE);
+<<<<<<< HEAD
   printf("Creating scope...\n");
   // create the global scope
   current_scope = create_scope(NULL);
@@ -57,6 +58,15 @@ void check_prog(T_prog prog) {
   //check_funclist(prog->funclist);
   // check the main function
   printf("Checking main...\n");
+=======
+  // create the global scope
+  current_scope = create_scope(NULL);
+  // add the global declarations
+  check_decllist(prog->decllist);
+  // check the function definitions
+  check_funclist(prog->funclist);
+  // check the main function
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
   check_main(prog->main);
   // clean-up the global scope
   destroy_scope(current_scope);
@@ -75,11 +85,17 @@ static void check_decl(T_decl decl) {
     	fprintf(stderr, "FATAL: unexpected NULL in check_decl\n");
     	exit(1);
   	}
+<<<<<<< HEAD
   	printf("symbol is %s\n", decl->ident);
   	if (lookup(current_scope->table, decl->ident) != NULL)
   		type_error("symbol is already bound in the current scope");
     insert(current_scope->table, decl->ident, &decl);  
     printf("Declaration %s added\n", decl->ident);
+=======
+  	if (lookup(current_scope->table, decl->ident) != NULL)
+  		type_error("symbol is already bound in the current scope");
+    insert(current_scope->table, decl->ident, &decl->type);  
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 }
 
 static void check_funclist(T_funclist funclist) {
@@ -90,6 +106,7 @@ static void check_funclist(T_funclist funclist) {
 }
 
 static void check_func(T_func func) {
+<<<<<<< HEAD
 	T_type type = lookup_in_all_scopes(current_scope, func->ident);
   	if (type != NULL)
   		type_error("function is already defined in the current scope");
@@ -102,6 +119,18 @@ static void check_func(T_func func) {
 	printf("Checking statement list (check_func)"); 
     check_stmtlist(func->stmtlist);
 	printf("Checking expr (check_func)");
+=======
+  	if(func->type->kind != E_functiontype)
+    	type_error("function is NOT declared with a function type");
+	T_type type = lookup_in_all_scopes(current_scope, func->ident);
+  	if (type != NULL)
+  		type_error("function is already defined in the current scope");
+    insert(current_scope->table, func->ident, &func);  
+  	// create a new scope
+  	current_scope = create_scope(current_scope); 
+    insert(current_scope->table, func->paramlist->ident, &func->paramlist); 
+    check_stmtlist(func->stmtlist);
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
     check_expr(func->returnexpr);
     if(!compare_types(func->type, func->returnexpr->type))
     	type_error("function returns different type from type definition");    	
@@ -114,7 +143,10 @@ static void check_func(T_func func) {
 
 // GIVEN
 static void check_main(T_main main) {
+<<<<<<< HEAD
   fprintf(stderr, "check_main");
+=======
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
   // create a new scope
   current_scope = create_scope(current_scope);
   // add argc and argv with their C runtime types
@@ -167,7 +199,10 @@ static void check_assignstmt(T_stmt stmt) {
   // check that the left-hand-side is an l-value, i.e., an identexpr or a deref unary expression
   switch (stmt->assignstmt.left->kind) {
   case E_identexpr:
+<<<<<<< HEAD
     // okay
+=======
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
     break;
   case E_unaryexpr:
     switch (stmt->assignstmt.left->unaryexpr.op) {
@@ -220,7 +255,11 @@ static void check_whilestmt(T_stmt stmt) {
 
 static void check_compoundstmt(T_stmt stmt) {
   	current_scope = create_scope(current_scope);
+<<<<<<< HEAD
   	check_stmt(stmt->whilestmt.body);
+=======
+  	check_stmt(stmt->compoundstmt.stmtlist->stmt);
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 	T_scope parent_scope = current_scope->parent;
 	destroy_scope(current_scope); current_scope = parent_scope;
 }
@@ -249,11 +288,18 @@ static void check_identexpr(T_expr expr) {
   	T_type type = lookup_in_all_scopes(current_scope, expr->identexpr);
   	if(NULL == type)
   		type_error("symbol has not been declared in scope");
+<<<<<<< HEAD
   	expr->type = type;
 }
 
 static void check_callexpr(T_expr expr) {
  	T_type type = lookup_in_all_scopes(current_scope, expr->identexpr);
+=======
+  	expr->type = expr->identexpr;
+}
+static void check_callexpr(T_expr expr) {
+ 	T_type type = lookup_in_all_scopes(current_scope, expr->callexpr.ident);
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
   	if(NULL == type)
   		type_error("call to undeclared function type");
   	if(!compare_types(type, expr->type))
@@ -279,11 +325,19 @@ static void check_arrayexpr(T_expr expr) {
   		type_error("call to undeclared identifier");
   	if(!compare_types(type, expr->type))
   		type_error("dereferencing object not array and not pointer");
+<<<<<<< HEAD
   	
+=======
+  	expr->type = type;
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 }
 
 static void check_unaryexpr(T_expr expr) {
   	check_expr(expr->unaryexpr.expr);
+<<<<<<< HEAD
+=======
+  	expr->type = expr->unaryexpr.expr->type;
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
   	switch(expr->unaryexpr.op)
   	{
   		case E_op_deref:
@@ -301,17 +355,29 @@ static void check_unaryexpr(T_expr expr) {
 }
 
 static void check_binaryexpr(T_expr expr) {
+<<<<<<< HEAD
   	check_expr(expr->binaryexpr.left);
   	check_expr(expr->binaryexpr.right);
+=======
+  	check_expr(expr->binaryexpr.right);
+  	check_expr(expr->binaryexpr.left);
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
   	switch(expr->binaryexpr.op)
   	{
   		case E_op_times:
 		case E_op_divide:
 		case E_op_mod:
+<<<<<<< HEAD
 		case E_op_plus:
 		case E_op_minus:
 			if(!compare_types(expr->binaryexpr.left->type, expr->binaryexpr.right->type))
 				type_error("operands have conflicting types");
+=======
+		case E_op_minus:
+		case E_op_plus:
+			if(!compare_types(expr->binaryexpr.left->type, expr->binaryexpr.right->type))
+				type_error("binary > operands have conflicting types");
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 			expr->type = expr->binaryexpr.left->type;
 			break;
 		case E_op_lt:
@@ -321,23 +387,39 @@ static void check_binaryexpr(T_expr expr) {
 		case E_op_eq:
 		case E_op_ne:
 			if(!compare_types(expr->binaryexpr.left->type, expr->binaryexpr.right->type))
+<<<<<<< HEAD
 				type_error("operands have conflicting types");
+=======
+				type_error("binary >> operands have conflicting types");
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 			expr->type = INTTYPE;
 			break;
 		case E_op_and:
 		case E_op_or:
 			if(!compare_types(expr->binaryexpr.left->type, INTTYPE))
+<<<<<<< HEAD
 				type_error("left operant has a non-supported type");
 			if(!compare_types(expr->binaryexpr.right->type, INTTYPE))
 				type_error("right operant has a non-supported type");
+=======
+				type_error("binary >>> left operant has a non-supported type");
+			if(!compare_types(expr->binaryexpr.right->type, INTTYPE))
+				type_error("binary >>>> right operant has a non-supported type");
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 			expr->type = INTTYPE;
 			break;
 	}
 }
 
 static void check_castexpr(T_expr expr) {	
+<<<<<<< HEAD
   	if(NULL == expr->castexpr.expr->type)
   		type_error("no function type for cast expression");
+=======
+  	if(NULL == expr->castexpr.type)
+  		type_error("no function type for cast expression");
+  	expr->type = expr->castexpr.type;
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 }
 
 /* type error */
@@ -345,6 +427,7 @@ static void type_error(char *msg) {
   fprintf(stderr, "%s\n", msg);
   exit(3);
 }
+<<<<<<< HEAD
 
 /* type comparison */
 bool compare_types(T_type type1, T_type type2) {
@@ -355,6 +438,13 @@ bool compare_types(T_type type1, T_type type2) {
   if (NULL == type1 || NULL == type2) {
     fprintf(stderr, "FATAL: unexpected NULL values in compare_types\n");
    	return false;// exit(1);
+=======
+/* type comparison */
+bool compare_types(T_type type1, T_type type2) {
+  if (NULL == type1 || NULL == type2) {
+    fprintf(stderr, "FATAL: unexpected NULL values in compare_types\n");
+   	exit(1);
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
   }
   if (type1->kind == type2->kind) {
     switch (type1->kind) {

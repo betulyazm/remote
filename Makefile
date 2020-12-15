@@ -1,9 +1,17 @@
 SRC := \
 	lexer.c \
 	parser.tab.c \
+<<<<<<< HEAD
 	typecheck.c \
   	codegen.c \
 	table.c \
+=======
+<<<<<<< HEAD
+	typecheck.c \
+	table.c \
+=======
+>>>>>>> 5bc3c3b290f0e2228f039ba62889af205e65914d
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
 	ast.c \
 	ast_printer.c \
 	util.c \

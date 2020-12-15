@@ -10,6 +10,13 @@ main {
   pointer<int> y;
   pointer<int> arr;
   char c;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+  arr = (pointer<int>) malloc(50);
+>>>>>>> 5bc3c3b290f0e2228f039ba62889af205e65914d
+>>>>>>> 2aee303af180cb6549e7ddf22e317385834266fa
   y = &x;
   *y = *y + f(y, '1');
   c = 't';
